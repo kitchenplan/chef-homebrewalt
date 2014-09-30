@@ -27,7 +27,7 @@ end
 homebrew_go = "#{Chef::Config[:file_cache_path]}/homebrew_go"
 
 remote_file homebrew_go do
-  source 'https://raw.github.com/Homebrew/homebrew/go/install'
+  source 'https://raw.githubusercontent.com/Homebrew/install/master/install'
   owner node['current_user']
   mode 00777
 end
