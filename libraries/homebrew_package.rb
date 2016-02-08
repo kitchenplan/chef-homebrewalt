@@ -65,30 +65,16 @@ class Chef
         end
 
         def current_installed_version
-          pkg = get_version_from_formula
-          versions = pkg.to_hash['installed'].map {|v| v['version']}
-          versions.join(" ") unless versions.empty?
+          get_version_from_command("brew list --versions | awk '/^#{@new_resource.package_name} / { print $2 }'")
         end
 
         def candidate_version
-          pkg = get_version_from_formula
-          pkg.stable.version.to_s || pkg.version.to_s
+          get_version_from_command("brew info #{@new_resource.package_name} | awk '/^#{@new_resource.package_name} / { print $2 }'")
         end
 
         def get_version_from_command(command)
           version = get_response_from_command(command).chomp
           version.empty? ? nil : version
-        end
-
-        def get_version_from_formula
-          brew_cmd = shell_out!("sudo -u #{node['current_user']} brew --prefix")
-          libpath = ::File.join(brew_cmd.stdout.chomp, "Library", "Homebrew")
-          $:.unshift(libpath)
-
-          require 'global'
-          require 'cmd/info'
-
-          Formula.factory new_resource.package_name
         end
 
         def get_response_from_command(command)
